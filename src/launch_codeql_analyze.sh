@@ -1,5 +1,4 @@
 #!/usr/bin/bash
-start=$SECONDS
 
 process_repo() {
     local repo_dir=$1
@@ -36,6 +35,7 @@ echo "début de l'analyse..."
 
 for repo_dir in repos/*/; 
 do 
+    start=$SECONDS
     process_repo "$repo_dir" 
 
     printf "Repo analysé : %-40s progression: %d/%d  [%ds]\n" "$(basename $repo_dir)" "$counter" "$1" "$((SECONDS - start))"

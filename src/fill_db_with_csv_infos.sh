@@ -1,5 +1,4 @@
 #!/bin/bash
-start=$SECONDS
 
 echo "[- PARTIE 6 PARSING CSV -]" 
 
@@ -14,6 +13,8 @@ if [ ! -f "$DB_NAME" ]; then echo "Erreur : Base de données introuvable."; exit
 # Boucle sur chaque fichier CSV
 for file in "$CSV_DIR"/*.csv; do
     [ -e "$file" ] || continue
+
+    start=$SECONDS
 
     # Extraction de l'ID du repo
     repo_id=$(basename "$file" .csv)

@@ -1,5 +1,4 @@
 #!/usr/bin/bash
-start=$SECONDS
 
 GITHUB_TOKEN=${GITHUB_TOKEN:-""}
 
@@ -55,6 +54,7 @@ while IFS= read -r line; do
     id=$(echo "$line" | jq -r '.id')
     url=$(echo "$line" | jq -r '.source_code' | sed 's|https://github.com/||' | sed 's|/tree/.*||')
 
+    start=$SECONDS
 
     mkdir -p "repos/$id"
     download_java_files "$url" "repos/$id"

@@ -1,5 +1,4 @@
 #!/bin/bash
-start=$SECONDS
 
 echo "[- PARTIE 5 PARSING JSON -]"
 
@@ -14,6 +13,8 @@ if [ ! -f "$JSON_FILE" ]; then echo "Erreur : Fichier JSON introuvable."; exit 1
 
 # 2. Extraction et insertion des données
 jq -c '.[]' "$JSON_FILE" | while read -r item; do
+
+    start=$SECONDS
     
     # Extraction des valeurs
     id=$(echo "$item" | jq -r '.id')
