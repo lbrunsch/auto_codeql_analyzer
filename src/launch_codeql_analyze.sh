@@ -33,7 +33,7 @@ process_repo() {
         2>&1 | >> logs
 
     # Suppression de la base
-    rm -rf "dbs/$id"
+    #rm -rf "dbs/$id"
     
     printf "Repo analysé : %-40s progression: %d/%d  [%ds]\n" "$id" "$2" "$3" "$((SECONDS - start))"
 
