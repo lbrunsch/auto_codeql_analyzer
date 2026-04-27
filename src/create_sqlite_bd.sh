@@ -12,7 +12,8 @@ sqlite3 "$DB_NAME" "CREATE TABLE IF NOT EXISTS repos (
       categories TEXT,
       url TEXT,
       creation_date DATE,
-      last_commit_date DATE
+      last_commit_date DATE,
+      nb_lines INTEGER
   );
 
   CREATE TABLE IF NOT EXISTS error_catalog (
