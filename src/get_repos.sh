@@ -1,6 +1,7 @@
-#!/usr/bin/bash
+#!/bin/bash
 
 GITHUB_TOKEN=${GITHUB_TOKEN:-""}
+THREADS=$3
 
 # Mise en place du GH token pour les requêtes
 build_curl_args() {
@@ -17,6 +18,12 @@ build_curl_args() {
 download_java_files() {
     local repo=$1
     local output_dir=$2
+    local counter=$3
+    local total=$4
+
+    mkdir -p $output_dir
+    
+    start=$SECONDS
 
     local api_response
     api_response=$(curl -s "${CURL_ARGS[@]}" "https://api.github.com/repos/$repo/git/trees/HEAD?recursive=1") 
@@ -37,13 +44,14 @@ download_java_files() {
     fi
 
     echo "$api_response" \
-        | jq -r '.tree[] | select(.path | endswith(".java")) | .path' \
+        | jq -r '.tree[] | select(.path | (endswith(".java") or endswith(".xml"))) | .path' \
         | while read -r filepath; do
             mkdir -p "$output_dir/$(dirname "$filepath")"
             curl -s "${CURL_ARGS[@]}" "https://raw.githubusercontent.com/$repo/HEAD/$filepath" \
                  -o "$output_dir/$filepath" >> logs 2>&1
             echo "  $filepath" >> logs
         done
+    printf "Repo obtenu : %-40s progression: %d/%d  [%ds]\n" "$repo" "$counter" "$total" "$((SECONDS - start))"
 }
 
 json_file=$1
@@ -58,15 +66,15 @@ build_curl_args
 while IFS= read -r line; do
     id=$(echo "$line" | jq -r '.id')
     url=$(echo "$line" | jq -r '.source_code' | sed 's|https://github.com/||' | sed 's|/tree/.*||')
-
-    start=$SECONDS
-
-    mkdir -p "repos/$id"
-    download_java_files "$url" "repos/$id"
-    printf "Repo obtenu : %-40s progression: %d/%d  [%ds]\n" "$url" "$counter" "$2" "$((SECONDS - start))"
+    while [ "$(jobs -rp | wc -l)" -ge "$THREADS" ]; do
+        sleep 0.5
+    done
+    
+    download_java_files "$url" "repos/$id" "$counter" "$2" &
+    
     ((counter++))
 
 done < <(jq -c '.[]' "$json_file")
-
+wait
 echo "Tous les repos on été téléchargés"
 
