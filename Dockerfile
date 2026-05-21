@@ -8,6 +8,7 @@ RUN apt-get update && apt-get install -y \
     unzip \
     git \
     sqlite3 \
+    gpg \
     && rm -rf /var/lib/apt/lists/*
  
 RUN curl -fsSL \
@@ -15,13 +16,19 @@ RUN curl -fsSL \
     -o /tmp/codeql.tar.gz \
     && tar -xzf /tmp/codeql.tar.gz -C /usr/local \
     && rm /tmp/codeql.tar.gz
+
+RUN \
+    mkdir -p /etc/apt/keyrings \
+    && curl -fsSL https://repo.charm.sh/apt/gpg.key | gpg --dearmor -o /etc/apt/keyrings/charm.gpg \
+    && echo "deb [signed-by=/etc/apt/keyrings/charm.gpg] https://repo.charm.sh/apt/ * *" | tee /etc/apt/sources.list.d/charm.list \
+    && apt update && apt install gum
+
  
 ENV PATH="/usr/local/codeql:${PATH}"
 
 COPY src/* /workspace/src/
-COPY main.sh /workspace/
  
 WORKDIR /workspace
- 
-CMD ["./main.sh"]
-#CMD ["/bin/bash"]
+
+ENTRYPOINT ./src/main.sh
+

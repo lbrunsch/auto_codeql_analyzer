@@ -6,7 +6,7 @@ echo ""
 
 # Configuration
 DB_NAME="./data/sqlite.db"
-JSON_FILE="./java_repo.json"
+JSON_FILE=$2
 counter=1
 
 # Vérification de l'existence des fichiers

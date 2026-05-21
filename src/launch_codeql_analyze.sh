@@ -29,7 +29,6 @@ process_repo() {
         green-code-initiative/java-queries@1.0.12 \
         --format=csv \
         --output="results/$id.csv" \
-        --download \
         2>&1 | >> logs
 
     # Suppression de la base
