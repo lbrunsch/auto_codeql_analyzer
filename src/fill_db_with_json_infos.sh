@@ -25,17 +25,19 @@ jq -c '.[]' "$JSON_FILE" | while read -r item; do
     
     # Transformation de la liste des catégories ["A", "B"] en chaîne "A, B"
     categories=$(echo "$item" | jq -r '.categories | join(", ") // ""')
+    created_at=$(echo "$item" | jq -r '.created_at_by_github // ""')
 
     # Mise à jour de la table repos
     sqlite3 "$DB_NAME" <<EOF
       UPDATE repos 
       SET stars = $stars, 
           categories = '$categories', 
-          url = '$source_code' 
+          url = '$source_code',
+          creation_date = '$created_at'
       WHERE id = '$id';
 
-      INSERT OR IGNORE INTO repos (id, stars, categories, url) 
-      VALUES ('$id', $stars, '$categories', '$source_code');
+      INSERT OR IGNORE INTO repos (id, stars, categories, url, creation_date) 
+      VALUES ('$id', $stars, '$categories', '$source_code', '$created_at');
 EOF
 
     printf "Mis à jour : %-40s progression: %d/%d  [%ds]\n" "$id" "$counter" "$1" "$((SECONDS - start))"

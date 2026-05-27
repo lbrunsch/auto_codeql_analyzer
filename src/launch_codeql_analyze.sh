@@ -2,6 +2,7 @@
 
 TOTAL=$1
 THREADS=$2
+DB_NAME="sqlite.db"
 counter=1
 
 process_repo() {
@@ -34,7 +35,7 @@ process_repo() {
     # Suppression de la base
     rm -rf "dbs/$id"
     
-    printf "Repo analysé : %-40s progression: %d/%d  [%ds]\n" "$id" "$2" "$3" "$((SECONDS - start))"
+    printf "Repo analysé : %-40s progression: %d/%d  [%ds]\n" "$repo_dir" "$2" "$3" "$((SECONDS - start))"
 
 
 }
@@ -51,8 +52,17 @@ do
   do
     sleep 0.5
   done
-    process_repo "$repo_dir" "$counter" "$TOTAL" &
-    ((counter++))
+    id=$(basename "$repo_dir")
+    nb_lines=$(sqlite3 "$DB_NAME" "SELECT nb_lines FROM repos WHERE id = '$id';")
+
+    if [ -n "$nb_lines" ]; then
+      echo "[SKIP] repo $repo_dir déjà analysé"
+      ((counter++))
+    else 
+      process_repo "$repo_dir" "$counter" "$TOTAL" &
+      ((counter++))
+    fi
+
 
 done
 

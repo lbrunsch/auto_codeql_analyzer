@@ -1,6 +1,6 @@
 #!/bin/bash
 
-REPOS_DIR="repos"
+REPOS_DIR="generated/repos"
 DB_FILE=sqlite.db
 
 echo ""
@@ -21,6 +21,7 @@ for dir in "$REPOS_DIR"/*/; do
     sqlite3 "$DB_FILE" "UPDATE repos SET nb_lines = $line_count WHERE id = '$name';"
  
     echo "$name : $line_count lignes"
+    rm -r $dir
 done
  
 echo "Résultats stockés dans '$DB_FILE'."

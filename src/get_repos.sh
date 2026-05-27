@@ -2,6 +2,7 @@
 
 GITHUB_TOKEN=$4
 THREADS=$3
+DB_NAME="sqlite.db"
 
 # Mise en place du GH token pour les requêtes
 build_curl_args() {
@@ -73,11 +74,17 @@ while IFS= read -r line; do
         sleep 0.5
     done
 
-    if [ -d "generated/repos/$id" ]; then
-      echo "Dossier trouvé pour $url, téléchargement skipped"
-    else
-      download_java_files "$url" "generated/repos/$id" "$counter" "$2" &
-      ((counter ++))
+    nb_lines=$(sqlite3 "$DB_NAME" "SELECT nb_lines FROM repos WHERE id = '$id';")
+
+    if [ -n "$nb_lines" ]; then
+      echo "[SKIP] données trouvés dans la BD pour $url"
+    else 
+      if [ -d "generated/repos/$id" ]; then
+        echo "Dossier trouvé pour $url, téléchargement skipped"
+      else
+        download_java_files "$url" "generated/repos/$id" "$counter" "$2" &
+        ((counter ++))
+      fi
     fi
 
 done < <(jq -c '.[]' "$json_file")
