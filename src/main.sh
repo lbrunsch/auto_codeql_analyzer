@@ -202,10 +202,10 @@ for file in generated/json/*.json; do
   ./src/launch_codeql_analyze.sh $nb_repos $CQL_THREADS
 
   # PARTIE 5
-  ./src/fill_db_with_json_infos.sh $nb_repos
+  ./src/fill_db_with_json_infos.sh $nb_repos $file
 
   # PARTIE 6
-  ./src/fill_db_with_csv_infos.sh $nb_repos
+  ./src/fill_db_with_csv_infos.sh $nb_repos $file
 
   # PARTIE 7
   ./src/fill_db_with_nb_lines.sh
